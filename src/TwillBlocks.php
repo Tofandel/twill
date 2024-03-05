@@ -45,12 +45,18 @@ class TwillBlocks
     public static $manualBlocks = [];
 
     /**
-     * @return A17\Twill\Services\Blocks\BlockCollection
+     * @return \A17\Twill\Services\Blocks\BlockCollection
      */
     private ?BlockCollection $blockCollection = null;
 
     private array $cropConfigs = [];
 
+    private Collection $usedBlocks;
+
+    public function __construct()
+    {
+        $this->usedBlocks = collect();
+    }
     /**
      * Registers a blocks directory.
      *
@@ -352,6 +358,11 @@ class TwillBlocks
         return $this->cropConfigs;
     }
 
+    public function getListOfUsedBlocks(): Collection
+    {
+        return $this->usedBlocks;
+    }
+
     public function generateListOfAllBlocks(bool $settingsOnly = false): Collection
     {
         return once(function () use ($settingsOnly) {
@@ -385,7 +396,7 @@ class TwillBlocks
                         return false;
                     }
                 }
-                return isset($disabledBlocks[$block->name]) || isset($disabledBlocks[ltrim($block->componentClass, '\\')]);
+                return !(isset($disabledBlocks[$block->name]) || isset($disabledBlocks[ltrim($block->componentClass, '\\')]));
             })->sortBy(function (Block $b) use ($customOrder) {
                 // Sort blocks by custom order then by group and then by name
                 return ($customOrder[$b->name] ?? $customOrder[ltrim($b->componentClass, '\\')] ?? PHP_INT_MAX) . '-' . $b->group . '-' . $b->name;
@@ -400,7 +411,7 @@ class TwillBlocks
         array|callable $excludeBlocks = [],
         bool $defaultOrder = false
     ): Collection {
-        $globalExcludeBlocks = TwillBlocks::getGloballyExcludedBlocks();
+        $globalExcludeBlocks = $this->getGloballyExcludedBlocks();
 
         $matchBlock = function ($matcher, $block, $someFn = null) {
             if (is_callable($matcher)) {
@@ -448,6 +459,8 @@ class TwillBlocks
                 $finalList = $finalList->sortBy(fn(Block $block) => $groups[$block->group] ?? PHP_INT_MAX, SORT_NUMERIC);
             }
         }
+
+        $this->usedBlocks = $this->usedBlocks->merge($finalList->keyBy(fn(Block $block) => $block->name));
         return $finalList;
     }
 }
