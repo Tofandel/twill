@@ -1205,7 +1205,10 @@ abstract class ModuleController extends Controller
             }
         }
 
-        return View::make($view, $this->form($id))->with(
+
+        $form = $this->form($id, $item);
+        View::share('form', $form);
+        return View::make($view, $form)->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($item))]
         );
     }
@@ -1239,9 +1242,10 @@ abstract class ModuleController extends Controller
             return View::exists($view);
         });
 
-        View::share('form', $this->form(null));
+        $form = $this->form(null);
+        View::share('form', $form);
 
-        return View::make($view, $this->form(null))->with(
+        return View::make($view, $form)->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($emptyModelInstance), true)]
         );
     }
@@ -1401,9 +1405,10 @@ abstract class ModuleController extends Controller
             );
         }
 
-        View::share('form', $this->form($id, $item));
+        $form = $this->form($id, $item);
+        View::share('form', $form);
 
-        return View::make($view, $this->form($id, $item))->with(
+        return View::make($view, $form)->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($item))]
         );
     }
