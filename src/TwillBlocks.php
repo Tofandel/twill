@@ -146,7 +146,7 @@ class TwillBlocks
 
     public function setGloballyExcludedBlocks(array $exclude = []): void
     {
-        $this->globallyExcludedBlocks = [];
+        $this->globallyExcludedBlocks = $exclude;
     }
 
     public function getGloballyExcludedBlocks(): array
