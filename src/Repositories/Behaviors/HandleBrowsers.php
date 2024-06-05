@@ -177,7 +177,6 @@ trait HandleBrowsers
      * @param string $relation
      * @param string|null $routePrefix
      * @param string $titleKey
-     * @param string|null $moduleName
      * @return array
      */
     public function getFormFieldsForBrowser(
