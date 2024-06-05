@@ -68,7 +68,6 @@ trait HandleBrowsers
                     $relation,
                     $browser['routePrefix'],
                     $browser['titleKey'],
-                    $browser['moduleName']
                 );
             }
         }
