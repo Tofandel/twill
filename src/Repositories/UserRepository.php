@@ -74,9 +74,8 @@ class UserRepository extends ModuleRepository
         $relation,
         $routePrefix = null,
         $titleKey = 'title',
-        $moduleName = null
     ) {
-        $browserFields = parent::getFormFieldsForBrowser($object, $relation, $routePrefix, $titleKey, $moduleName);
+        $browserFields = parent::getFormFieldsForBrowser($object, $relation, $routePrefix, $titleKey);
 
         if (TwillPermissions::enabled()) {
             $everyoneGroup = twillModel('group')::getEveryoneGroup();

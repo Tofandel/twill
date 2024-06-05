@@ -97,12 +97,7 @@ trait HandleRelatedBrowsers
     {
         foreach ($old->relatedItems?->groupBy('browser_name') ?? [] as $browserName => $group) {
             $new->saveRelated(
-                $group->map(function ($item) {
-                    return [
-                        'id' => $item->related->id,
-                        'endpointType' => $item->related->getMorphClass(),
-                    ];
-                })->toArray(),
+                $group->map(fn ($item) => $item->related),
                 $browserName
             );
         }
