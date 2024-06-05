@@ -183,22 +183,14 @@ trait HandleBrowsers
     public function getFormFieldsForBrowser(
         $object,
         $relation,
-        $routePrefix = null,
-        $titleKey = 'title',
-        $moduleName = null
+        $routePrefix = null, //TODO remove this unused param in v4
+        $titleKey = 'title', //TODO this is also flaky as there could be multiple model types in the browser and they might not have the same title key, we need to have one source of truth for this info
     ) {
         $fields = $this->getRelatedElementsAsCollection($object, $relation);
 
-        $isMorphTo = method_exists($object, $relation) && $object->$relation() instanceof MorphTo;
-
         if ($fields->isNotEmpty()) {
             return $fields->map(
-                function ($relatedElement) use ($titleKey, $routePrefix, $relation, $moduleName, $isMorphTo) {
-                    if ($isMorphTo && !$moduleName) {
-                        // @todo: Maybe there is an existing helper for this?
-                        $moduleName = Str::plural(Arr::last(explode('\\', get_class($relatedElement))));
-                    }
-
+                function ($relatedElement) use ($titleKey) {
                     return [
                             'id' => $relatedElement->id,
                             'name' => $relatedElement->titleInBrowser ?? $relatedElement->$titleKey,
@@ -208,7 +200,7 @@ trait HandleBrowsers
                             'thumbnail' => $relatedElement->defaultCmsImage(['w' => 100, 'h' => 100, 'fit' => 'crop']),
                         ] : []);
                 }
-            )->toArray();
+            )->all();
         }
 
         return [];

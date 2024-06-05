@@ -15,9 +15,9 @@ class ConnectedField implements CanRenderForBlocks, CanHaveSubfields
     public function render()
     {
         return view('twill::partials.form.utils._connected_fields', [
-            ...$this->connectedTo,
+            //...$this->connectedTo,
             'renderForBlocks' => $this->forBlocks(),
-            'slot' => $component->render(),
+            //'slot' => $component->render(),
         ]);
     }
 }
