@@ -80,7 +80,7 @@ trait HasRelated
             }
 
             $firstMatchKey = $itemsToProcess
-                ->where(fn (RelatedItem $item) => $item->related_id === $id && $item->related_type === $type)
+                ->where(fn (RelatedItem $item) => $item->related_id == $id && $item->related_type === $type)
                 // We should only have one item always as you cannot select the same items twice.
                 ->keys()
                 ->first();
