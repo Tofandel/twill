@@ -66,7 +66,7 @@
         }
       },
       ...mapState({
-        browserTitle: state => state.browser.title
+        browserTitle: state => state.browser?.title || ''
       })
     },
     watch: {
@@ -121,7 +121,7 @@
         this.hidden = true
         this.mask()
       },
-      close: function (onClose) {
+      close: function () {
         if (!this.active) return
         if (this.locked) return
 
