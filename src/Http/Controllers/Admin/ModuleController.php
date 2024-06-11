@@ -1184,6 +1184,7 @@ abstract class ModuleController extends Controller
         $this->setBackLink();
 
         $controllerForm = $this->getForm($item);
+        $controllerForm->registerDynamicRepeaters();
 
         if ($controllerForm->hasForm()) {
             $view = 'twill::layouts.form';
@@ -1205,11 +1206,14 @@ abstract class ModuleController extends Controller
             }
         }
 
-
         $form = $this->form($id, $item);
         View::share('form', $form);
+
+        $sideFieldsets = $this->getSideFieldsets($item);
+        $sideFieldsets->registerDynamicRepeaters();
+
         return View::make($view, $form)->with(
-            ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($item))]
+            ['formBuilder' => $controllerForm->toFrontend($sideFieldsets)]
         );
     }
 
@@ -1369,7 +1373,7 @@ abstract class ModuleController extends Controller
 
     /**
      * @param int $id
-     * @return \Illuminate\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function restoreRevision($id)
     {
@@ -1406,7 +1410,6 @@ abstract class ModuleController extends Controller
         }
 
         $form = $this->form($id, $item);
-        View::share('form', $form);
 
         return View::make($view, $form)->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($item))]
