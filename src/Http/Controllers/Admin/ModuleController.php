@@ -1206,13 +1206,10 @@ abstract class ModuleController extends Controller
             }
         }
 
-        $form = $this->form($id, $item);
-        View::share('form', $form);
-
         $sideFieldsets = $this->getSideFieldsets($item);
         $sideFieldsets->registerDynamicRepeaters();
 
-        return View::make($view, $form)->with(
+        return View::make($view, $this->form($id, $item))->with(
             ['formBuilder' => $controllerForm->toFrontend($sideFieldsets)]
         );
     }
@@ -1246,10 +1243,7 @@ abstract class ModuleController extends Controller
             return View::exists($view);
         });
 
-        $form = $this->form(null);
-        View::share('form', $form);
-
-        return View::make($view, $form)->with(
+        return View::make($view, $this->form(null))->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($emptyModelInstance), true)]
         );
     }
@@ -1409,9 +1403,7 @@ abstract class ModuleController extends Controller
             );
         }
 
-        $form = $this->form($id, $item);
-
-        return View::make($view, $form)->with(
+        return View::make($view, $this->form($id, $item))->with(
             ['formBuilder' => $controllerForm->toFrontend($this->getSideFieldsets($item))]
         );
     }
