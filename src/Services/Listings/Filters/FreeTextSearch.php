@@ -15,29 +15,27 @@ class FreeTextSearch extends TwillBaseFilter
 
     public function applyFilter(Builder $builder): Builder
     {
-        if (!empty($this->searchString)) {
-            if ($this->searchColumns !== [] || isset($this->searchQuery)) {
-                /** @var \A17\Twill\Models\Model $builderModel */
-                $translatedAttributes = $builder->getModel()->getTranslatedAttributes();
-                $builder->where(function (Builder $builder) use ($translatedAttributes) {
-                    if (isset($this->searchQuery)) {
-                        call_user_func($this->searchQuery, $builder, $this->searchString, $translatedAttributes);
+        if (!empty($this->searchString) && ($this->searchColumns !== [] || isset($this->searchQuery))) {
+            /** @var \A17\Twill\Models\Model $builderModel */
+            $translatedAttributes = $builder->getModel()->getTranslatedAttributes();
+            $builder->where(function (Builder $builder) use ($translatedAttributes) {
+                if (isset($this->searchQuery)) {
+                    call_user_func($this->searchQuery, $builder, $this->searchString, $translatedAttributes);
+                }
+                foreach ($this->searchColumns as $column) {
+                    if (in_array($column, $translatedAttributes, true)) {
+                        $builder->orWhereTranslationLike($column, "%$this->searchString%");
+                    } else {
+                        $builder->orWhere($column, getLikeOperator(), "%$this->searchString%");
                     }
-                    foreach ($this->searchColumns as $column) {
-                        if (in_array($column, $translatedAttributes, true)) {
-                            $builder->orWhereTranslationLike($column, "%$this->searchString%");
-                        } else {
-                            $builder->orWhere($column, getLikeOperator(), "%$this->searchString%");
-                        }
-                    }
-                });
-            }
+                }
+            });
         }
 
         return $builder;
     }
 
-    public function searchQuery(callable $query): static
+    public function searchQuery(?callable $query): static
     {
         $this->searchQuery = $query;
 
@@ -54,6 +52,7 @@ class FreeTextSearch extends TwillBaseFilter
     public function searchColumns(array $columns): static
     {
         $this->searchColumns = $columns;
+
         return $this;
     }
 }

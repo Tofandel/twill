@@ -637,7 +637,7 @@ abstract class ModuleController extends Controller
 
     /**
      * If you need finer control over the search query, you may provide a callback
-     * @param callable $query With the following signature: fn (Builder $query, string $searchString): void => $query
+     * @param callable $query With the following signature: fn (Builder $query, string $searchString, array $translatedAttributes): void => $query
      */
     protected function setSearchQuery(callable $query): void
     {
