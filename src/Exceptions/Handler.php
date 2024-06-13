@@ -2,14 +2,22 @@
 
 namespace A17\Twill\Exceptions;
 
+use A17\Twill\Facades\TwillRoutes;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+/** @deprecated It is not needed anymore and will be removed in v4 */
 class Handler extends ExceptionHandler
 {
+    public function __construct(Container $container)
+    {
+        parent::__construct($container);
+
+        trigger_deprecation('area17/twill', '3.4', 'The Twill Exception handler is deprecated and will be removed in v4');
+    }
+
     /**
      * Get the view used to render HTTP exceptions.
      *
@@ -17,13 +25,7 @@ class Handler extends ExceptionHandler
      */
     protected function getHttpExceptionView(HttpExceptionInterface $e)
     {
-        $usesAdminPath = !empty(config('twill.admin_app_path'));
-        $adminAppUrl = config('twill.admin_app_url', config('app.url'));
-
-        $isSubdomainAdmin = !$usesAdminPath && Str::contains(Request::url(), $adminAppUrl);
-        $isSubdirectoryAdmin = $usesAdminPath && Str::startsWith(Request::path(), config('twill.admin_app_path'));
-
-        return $this->getTwillErrorView($e->getStatusCode(), !$isSubdomainAdmin && !$isSubdirectoryAdmin);
+        return $this->getTwillErrorView($e->getStatusCode(), !TwillRoutes::isTwillRequest());
     }
 
     /**
