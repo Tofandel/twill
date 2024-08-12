@@ -6,6 +6,7 @@ use A17\Twill\Models\Behaviors\HasMedias;
 use A17\Twill\Repositories\ModuleRepository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -124,7 +125,7 @@ class DashboardController extends Controller
             $found = $repository->cmsSearch(
                 $request->get('search'),
                 $module['search_fields'] ?? ['title'],
-                isset($module['parentRelationship']) ? fn($q) => $q->whereHas($module['parentRelationship']) : null
+                isset($module['parentRelationship']) ? fn(Builder $q) => $q->whereHas($module['parentRelationship']) : null
             )->take(10);
 
             return $found->map(function ($item) use ($module) {
