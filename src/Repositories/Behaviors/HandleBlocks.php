@@ -110,7 +110,7 @@ trait HandleBlocks
             $this->validateBlockArray($block, $blockInstance, $handleTranslations);
         }
 
-        $existingBlockIds = $object->blocks()->pluck('id')->toArray();
+        $existingBlockIds = $object->wasRecentlyCreated ? [] : $object->blocks()->pluck('id')->toArray();
 
         $usedBlockIds = [];
 
