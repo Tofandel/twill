@@ -1,10 +1,10 @@
 <template>
   <a17-inputframe :name="name" :error="error" :note="note" :label="label" :label-for="uniqId" class="datePicker"
                   :class="{ 'datePicker--static' : staticMode, 'datePicker--mobile' : isMobile }" :required="required">
-    <div class="datePicker__group" :ref="refs.flatPicker">
+    <div class="datePicker__group" ref="flatPicker">
       <div class="form__field datePicker__field">
         <input type="text" :name="name" :id="uniqId" :required="required" :placeholder="placeHolder" data-input
-               @blur="onBlur" v-model="date" :disabled="disabled">
+               v-model="date" :disabled="disabled">
         <a href="#" v-if="clear" class="datePicker__reset" :class="{ 'datePicker__reset--cleared' : !date }"
            @click.prevent="onClear"><span v-svg symbol="close_icon"></span></a>
       </div>
@@ -109,13 +109,10 @@
         date: this.initialValue,
         isMobile: false,
         flatPicker: null,
-        refs: {
-          flatPicker: 'flatPicker'
-        }
       }
     },
     computed: {
-      uniqId: function (value) {
+      uniqId: function () {
         return this.name + '-' + this.randKey
       },
       altFormatComputed: function () {
@@ -127,26 +124,25 @@
     },
     methods: {
       config: function () {
-        const self = this
         const config = {
           wrap: true,
           altInput: true,
-          altFormat: self.altFormatComputed,
-          dateFormat: (self.enableTime && self.noCalendar) ? 'H:i:S' : (self.enableTime ? 'Z' : 'Y-m-d'), // This is the universal format that will be parsed by the back-end.
-          static: self.staticMode,
-          appendTo: self.staticMode ? self.$refs[self.refs.flatPicker] : undefined,
-          enableTime: self.enableTime,
-          noCalendar: self.noCalendar,
-          time_24hr: self.time_24hr,
-          inline: self.inline,
-          allowInput: self.allowInput,
-          mode: self.mode,
-          minuteIncrement: self.minuteIncrement,
-          hourIncrement: self.hourIncrement,
-          minDate: self.minDate,
+          altFormat: this.altFormatComputed,
+          dateFormat: (this.enableTime && this.noCalendar) ? 'H:i:S' : (this.enableTime ? 'Z' : 'Y-m-d'), // This is the universal format that will be parsed by the back-end.
+          static: this.staticMode,
+          appendTo: this.staticMode ? this.$refs.flatPicker : undefined,
+          enableTime: this.enableTime,
+          noCalendar: this.noCalendar,
+          time_24hr: this.time_24hr,
+          inline: this.inline,
+          allowInput: this.allowInput,
+          mode: this.mode,
+          minuteIncrement: this.minuteIncrement,
+          hourIncrement: this.hourIncrement,
+          minDate: this.minDate,
           altInputClass: 'flatpickr-input form-control',
-          maxDate: self.maxDate,
-          parseDate: function (date, format) {
+          maxDate: this.maxDate,
+          parseDate: (date) => {
             const fullFormat = 'yyyy-MM-dd HH:mm:ss';
             if (date.length === fullFormat.length) {
               return parse(date + 'Z', fullFormat + 'X', Date.UTC());
@@ -160,7 +156,7 @@
               return parse(date, fullFormatNoTime, Date.UTC());
             }
 
-            if (self.isValidTime(date)) {
+            if (this.isValidTime(date)) {
               const currentDate = new Date();
               date = `${currentDate.toDateString()} ${date}`;
             }
@@ -168,23 +164,22 @@
             // Hope for the best..
             return new Date(date);
           },
-          onOpen: function () {
-            setTimeout(function () {
-              self.flatPicker.set('maxDate', self.maxDate) // in case maxDate changed since last open
-              self.flatPicker.set('minDate', self.minDate) // in case minDate changed since last open
-              self.$emit('open', self.date)
+          onOpen: () => {
+            setTimeout(() => {
+              this.flatPicker.set('maxDate', this.maxDate) // in case maxDate changed since last open
+              this.flatPicker.set('minDate', this.minDate) // in case minDate changed since last open
+              this.$emit('open', this.date)
             }, 10)
 
           },
-          onClose: function (selectedDates, dateStr, instance) {
-            self.$nextTick(function () { // wait for the datepicker to properly update the UI
-              self.$emit('input', self.date)
-              self.$emit('close', self.date)
-
-              // see formStore mixin
-              self.saveIntoStore()
+          onClose: () => {
+            this.$nextTick(() => { // wait for the datepicker to properly update the UI
+              this.$emit('close', this.date)
             })
-          }
+          },
+          onChange: () =>
+            // see formStore mixin
+            this.onInput()
         }
 
         const locale = locales[getCurrentLocale()]
@@ -201,19 +196,14 @@
           this.flatPicker.setDate(newValue)
         }
       },
-      onInput: function (evt) {
+      onInput: function () {
+        // see formStore mixin
+        this.saveIntoStore()
         this.$emit('input', this.date)
-      },
-      onBlur: function () {
-        this.$emit('blur', this.date)
       },
       onClear: function () {
         this.flatPicker.clear()
-
-        // see formStore mixin
-        this.saveIntoStore()
-
-        this.$emit('input', this.date)
+        this.onInput()
       },
       isValidTime: function (string) {
         const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9](?: (AM|PM))?$/i;
@@ -222,16 +212,14 @@
       }
     },
     mounted: function () {
-      const self = this
-      const el = self.$refs[self.refs.flatPicker]
-      const opts = self.config()
-      self.flatPicker = new FlatPickr(el, opts)
+      const el = this.$refs.flatPicker
+      const opts = this.config()
+      this.flatPicker = new FlatPickr(el, opts)
 
-      this.isMobile = self.flatPicker.isMobile
+      this.isMobile = this.flatPicker.isMobile
     },
     beforeDestroy: function () {
-      const self = this
-      self.flatPicker.destroy()
+      this.flatPicker.destroy()
     }
   }
 </script>
