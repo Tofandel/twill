@@ -172,14 +172,18 @@
             }, 10)
 
           },
-          onClose: () => {
+          onClose: (_, dateStr) => {
             this.$nextTick(() => { // wait for the datepicker to properly update the UI
               this.$emit('close', this.date)
+              if (!this.disabled) {
+                this.date = dateStr;
+                this.onInput();
+              }
             })
           },
-          onChange: () =>
-            // see formStore mixin
-            this.onInput()
+          onChange: () => {
+            this.$nextTick(() => this.onInput())
+          }
         }
 
         const locale = locales[getCurrentLocale()]
