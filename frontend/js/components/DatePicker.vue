@@ -143,16 +143,12 @@
           altInputClass: 'flatpickr-input form-control',
           maxDate: this.maxDate,
           parseDate: (date) => {
-            const fullFormat = 'yyyy-MM-dd HH:mm:ss';
-            if (date.length === fullFormat.length) {
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(date)) {
+              const fullFormat = 'yyyy-MM-dd HH:mm:ss';
               return parse(date + 'Z', fullFormat + 'X', Date.UTC());
             }
-            const fullFormatNoSeconds = 'yyyy-MM-dd HH:mm';
-            if (date.length === fullFormatNoSeconds.length) {
-              return parse(date + 'Z', fullFormat + 'X', Date.UTC());
-            }
-            const fullFormatNoTime = 'yyyy-MM-dd';
-            if (date.length === fullFormatNoTime.length) {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+              const fullFormatNoTime = 'yyyy-MM-dd';
               return parse(date, fullFormatNoTime, Date.UTC());
             }
 
@@ -162,7 +158,7 @@
             }
 
             // Hope for the best..
-            return new Date(date);
+            return new Date(date.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
           },
           onOpen: () => {
             setTimeout(() => {
