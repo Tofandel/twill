@@ -154,7 +154,7 @@
 
             if (this.isValidTime(date)) {
               const currentDate = new Date();
-              date = `${currentDate.toDateString()} ${date}`;
+              date = `${currentDate.toISOString().slice(0, 10)} ${date}`;
             }
 
             // Hope for the best..
