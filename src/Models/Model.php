@@ -49,6 +49,7 @@ abstract class Model extends BaseModel implements TaggableInterface, TwillModelC
         if ($this->isFillable('published')) {
             return $query->where($query->qualifyColumn('published'), true);
         }
+
         return $query;
     }
 
@@ -137,6 +138,7 @@ abstract class Model extends BaseModel implements TaggableInterface, TwillModelC
         if ($this->isFillable('published')) {
             return $query->where($query->qualifyColumn('published'), false);
         }
+
         return $query;
     }
 
