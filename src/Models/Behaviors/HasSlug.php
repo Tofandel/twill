@@ -157,7 +157,7 @@ trait HasSlug
     public function updateOrNewSlug(array $slugParams): void
     {
         if (in_array($slugParams['locale'], config('twill.slug_utf8_languages', []))) {
-            $slugParams['slug'] = $this->getUtf8Slug($slugParams['slug']);
+            $slugParams['slug'] = $this->getUtf8Slug($slugParams['slug'], ['from_encoding' => mb_list_encodings()]);
         } else {
             $slugParams['slug'] = Str::slug($slugParams['slug']);
         }
@@ -504,19 +504,20 @@ trait HasSlug
      */
     public function getUtf8Slug(string $str, array $options = []): string
     {
-        // Make sure string is in UTF-8 and strip invalid UTF-8 characters
-        $str = mb_convert_encoding((string)$str, 'UTF-8', mb_list_encodings());
-
         $defaults = [
             'delimiter' => '-',
             'limit' => null,
             'lowercase' => true,
             'replacements' => [],
             'transliterate' => true,
+            'from_encoding' => null,
         ];
 
         // Merge options
         $options = array_merge($defaults, $options);
+
+        // Make sure string is in UTF-8 and strip invalid UTF-8 characters
+        $str = mb_convert_encoding((string)$str, 'UTF-8', $options['from_encoding']);
 
         $char_map = [
             // Latin
