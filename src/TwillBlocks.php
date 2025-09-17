@@ -402,10 +402,10 @@ class TwillBlocks
     }
 
     public function generateListOfAvailableBlocks(
-        array|callable $blocks = null,
+        array|callable|null $blocks = null,
         ?array $groups = null,
         bool $settingsOnly = false,
-        array|callable $excludeBlocks = null,
+        array|callable|null $excludeBlocks = null,
         bool $defaultOrder = false,
     ): Collection {
         $globalExcludeBlocks = $this->getGloballyExcludedBlocks();

@@ -133,7 +133,7 @@ class FeaturedController extends Controller
      * @param string|null $search
      * @return array
      */
-    private function getFeaturedSources(Request $request, $featuredSection, string $search = null, string $contentType = null)
+    private function getFeaturedSources(Request $request, $featuredSection, ?string $search = null, ?string $contentType = null)
     {
         $featuredSources = [];
 
@@ -161,7 +161,7 @@ class FeaturedController extends Controller
                 if (!empty($contentType) || empty($featuredSources)) {
                     $items = $repository->get(
                         $bucketable['with'] ?? [],
-                        ($bucketable['scopes'] ?? []) + ($scopes ?? []),
+                        $bucketable['scopes'] ?? [],
                         $bucketable['orders'] ?? [],
                         $bucketable['per_page'] ?? $request->get('offset') ?? 10,
                         true,

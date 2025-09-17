@@ -122,7 +122,7 @@ class TwillCapsules
             });
     }
 
-    public function capsuleNamespace(string $capsuleName, string $type = null): string
+    public function capsuleNamespace(string $capsuleName, ?string $type = null): string
     {
         // @todo: Read from capsules to get this data.
         $base = config('twill.capsules.namespaces.base');

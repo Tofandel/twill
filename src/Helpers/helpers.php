@@ -100,6 +100,7 @@ if (! function_exists('fireCmsEvent')) {
     function fireCmsEvent($eventName, $input = [])
     {
         $method = method_exists(\Illuminate\Events\Dispatcher::class, 'dispatch') ? 'dispatch' : 'fire';
+        /** @phpstan-ignore staticMethod.notFound */
         Event::$method($eventName, [$eventName, $input]);
     }
 }

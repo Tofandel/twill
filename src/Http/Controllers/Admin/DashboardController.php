@@ -595,7 +595,7 @@ class DashboardController extends Controller
         })->collapse()->values();
     }
 
-    private function getRepository(string $module, string $forModule = null): ModuleRepository
+    private function getRepository(string $module, ?string $forModule = null): ModuleRepository
     {
         $moduleName = '';
 
