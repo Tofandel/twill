@@ -85,9 +85,7 @@ class BlockEditor extends BaseFormField
     }
 
     /**
-     * Use this method if you want to exclude any block types
-     *
-     * @param array<string>|callable<Block> $blocks
+     * Use this method if you want to exclude any block types.
      */
     public function excludeBlocks(array|callable $blocks): static
     {

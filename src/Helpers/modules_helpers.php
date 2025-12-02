@@ -1,18 +1,18 @@
 <?php
 
+use A17\Twill\Exceptions\ModuleNotFoundException;
+use A17\Twill\Exceptions\NoCapsuleFoundException;
+use A17\Twill\Facades\TwillCapsules;
 use A17\Twill\Models\Contracts\TwillModelContract;
-use Illuminate\Support\Str;
 use A17\Twill\Models\Permission;
 use A17\Twill\Repositories\ModuleRepository;
 use Illuminate\Filesystem\Filesystem;
-use A17\Twill\Facades\TwillCapsules;
-use A17\Twill\Exceptions\ModuleNotFoundException;
-use A17\Twill\Exceptions\NoCapsuleFoundException;
+use Illuminate\Support\Str;
 
-if (!function_exists('getAllModules')) {
+if (! function_exists('getAllModules')) {
     function getAllModules()
     {
-        $repositories = collect(app(FileSystem::class)->glob(app_path('Repositories') . '/*.php'))->map(function ($repository) {
+        $repositories = collect(app(Filesystem::class)->glob(app_path('Repositories') . '/*.php'))->map(function ($repository) {
             $re = "/(?<=Repositories\/).+(?=\.php)/";
             preg_match($re, $repository, $matches);
 
@@ -24,19 +24,19 @@ if (!function_exists('getAllModules')) {
         });
 
         return $moduleRepositories->map(function ($repository) {
-            $modelName = str_replace(array('App\\Repositories\\', 'Repository'), '', $repository);
+            $modelName = str_replace(['App\\Repositories\\', 'Repository'], '', $repository);
 
             return Str::plural(lcfirst($modelName));
         });
     }
 }
 
-if (!function_exists('getModelByModuleName')) {
+if (! function_exists('getModelByModuleName')) {
     function getModelByModuleName($moduleName)
     {
         $model = config('twill.namespace') . '\\Models\\' . Str::studly(Str::singular($moduleName));
 
-        if (!class_exists($model)) {
+        if (! class_exists($model)) {
             try {
                 $model = TwillCapsules::getCapsuleForModule($moduleName)->getModel();
             } catch (NoCapsuleFoundException) {
@@ -48,7 +48,7 @@ if (!function_exists('getModelByModuleName')) {
     }
 }
 
-if (!function_exists('getModuleNameByModel')) {
+if (! function_exists('getModuleNameByModel')) {
     function getModuleNameByModel($model)
     {
         try {
@@ -59,20 +59,20 @@ if (!function_exists('getModuleNameByModel')) {
     }
 }
 
-if (!function_exists('getRepositoryByModuleName')) {
+if (! function_exists('getRepositoryByModuleName')) {
     function getRepositoryByModuleName($moduleName)
     {
         return getModelRepository(class_basename(getModelByModuleName($moduleName)));
     }
 }
 
-if (!function_exists('getModelRepository')) {
+if (! function_exists('getModelRepository')) {
     function getModelRepository($relation, $model = null)
     {
         if ($relation instanceof TwillModelContract) {
             $model = get_class($relation);
         }
-        if (!$model) {
+        if (! $model) {
             $model = ucfirst(Str::singular($relation));
         }
         if ($model instanceof TwillModelContract) {
@@ -82,7 +82,7 @@ if (!function_exists('getModelRepository')) {
 
         $repository = config('twill.namespace') . '\\Repositories\\' . $model . 'Repository';
 
-        if (!class_exists($repository)) {
+        if (! class_exists($repository)) {
             try {
                 $repository = TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
             } catch (NoCapsuleFoundException) {
@@ -94,14 +94,14 @@ if (!function_exists('getModelRepository')) {
     }
 }
 
-if (!function_exists('getModelController')) {
+if (! function_exists('getModelController')) {
     function getModelController(TwillModelContract $model)
     {
         $modelName = Str::afterLast($model::class, '\\');
 
         $controller = config('twill.namespace') . '\\Http\\Controllers\\Twill\\' . $modelName . 'Controller';
 
-        if (!class_exists($controller)) {
+        if (! class_exists($controller)) {
             try {
                 $controller = TwillCapsules::getCapsuleForModel($model)->getControllerClass();
             } catch (NoCapsuleFoundException) {
@@ -113,7 +113,7 @@ if (!function_exists('getModelController')) {
     }
 }
 
-if (!function_exists('updatePermissionOptions')) {
+if (! function_exists('updatePermissionOptions')) {
     function updatePermissionOptions($options, $user, $item)
     {
         $permissions = [];
@@ -158,14 +158,14 @@ if (!function_exists('updatePermissionOptions')) {
     }
 }
 
-if (!function_exists('updatePermissionGroupOptions')) {
+if (! function_exists('updatePermissionGroupOptions')) {
     function updatePermissionGroupOptions($options, $item, $group)
     {
         return $options;
     }
 }
 
-if (!function_exists('isUserGroupPermissionItemExists')) {
+if (! function_exists('isUserGroupPermissionItemExists')) {
     function isUserGroupPermissionItemExists($user, $item, $permission)
     {
         foreach ($user->publishedGroups as $group) {
@@ -178,7 +178,7 @@ if (!function_exists('isUserGroupPermissionItemExists')) {
     }
 }
 
-if (!function_exists('isUserGroupPermissionModuleExists')) {
+if (! function_exists('isUserGroupPermissionModuleExists')) {
     function isUserGroupPermissionModuleExists($user, $moduleName, $permission)
     {
         foreach ($user->publishedGroups as $group) {

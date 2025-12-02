@@ -125,7 +125,7 @@ class DashboardController extends Controller
             $found = $repository->cmsSearch(
                 $request->get('search'),
                 $module['search_fields'] ?? ['title'],
-                isset($module['parentRelationship']) ? fn(Builder $q) => $q->whereHas($module['parentRelationship']) : null
+                isset($module['parentRelationship']) ? fn (Builder $q) => $q->whereHas($module['parentRelationship']) : null
             )->take(10);
 
             return $found->map(function ($item) use ($module) {
@@ -308,7 +308,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array|\Illuminate\Support\Collection
+     * @return array|Collection
      */
     private function getFacts()
     {
@@ -350,8 +350,8 @@ class DashboardController extends Controller
                 $statsByDate = Collection::make($response['rows'] ?? [])->map(function (array $dateRow) {
                     return [
                         'date' => $dateRow[0],
-                        'users' => (int)$dateRow[1],
-                        'pageViews' => (int)$dateRow[2],
+                        'users' => (int) $dateRow[1],
+                        'pageViews' => (int) $dateRow[2],
                         'bounceRate' => $dateRow[3],
                         'pageviewsPerSession' => $dateRow[4],
                     ];
@@ -422,7 +422,7 @@ class DashboardController extends Controller
 
     /**
      * @param string $period
-     * @param \Illuminate\Support\Collection $statsByDate
+     * @param Collection $statsByDate
      * @return array
      */
     private function getPeriodStats($period, $statsByDate)
@@ -544,12 +544,12 @@ class DashboardController extends Controller
                     'all',
                     $module['countScope'] ?? []
                 ) : null,
-                'url' => !$isNestedModule ? moduleRoute(
+                'url' => ! $isNestedModule ? moduleRoute(
                     $module['name'],
                     $module['routePrefix'] ?? null,
                     'index'
                 ) : null,
-                'createUrl' => ($moduleOptions['create'] && !$isNestedModule) ? moduleRoute(
+                'createUrl' => ($moduleOptions['create'] && ! $isNestedModule) ? moduleRoute(
                     $module['name'],
                     $module['routePrefix'] ?? null,
                     'index',
@@ -589,7 +589,7 @@ class DashboardController extends Controller
                         $module['routePrefix'] ?? null,
                         'edit',
                         array_filter([$parent_id ?? null, $draft->id])
-                    )
+                    ),
                 ];
             });
         })->collapse()->values();
@@ -599,7 +599,7 @@ class DashboardController extends Controller
     {
         $moduleName = '';
 
-        if (!$forModule) {
+        if (! $forModule) {
             if (Str::contains($module, '.')) {
                 $parts = explode('.', $module);
                 foreach ($parts as $part) {

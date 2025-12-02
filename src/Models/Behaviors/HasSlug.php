@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 trait HasSlug
 {
     private int $nb_variation_slug = 3;
+
     public ?array $twillSlugData = null;
 
     private bool $twill_restoring = false;
@@ -33,7 +34,7 @@ trait HasSlug
         });
 
         static::saved(function (self $model) {
-            if (!$model->twill_restoring) {
+            if (! $model->twill_restoring) {
                 $model->handleSlugsSaving();
                 $model->twillSlugData = null;
             }
@@ -73,7 +74,7 @@ trait HasSlug
 
     protected function getSlugClassName(): string
     {
-        return class_basename($this) . "Slug";
+        return class_basename($this) . 'Slug';
     }
 
     public function scopeForSlug(Builder $query, string $slug): Builder
@@ -123,7 +124,7 @@ trait HasSlug
             $slug->save();
         });
 
-        if (!$hasActive) {
+        if (! $hasActive) {
             $this->setSlugs();
         }
     }
@@ -157,7 +158,7 @@ trait HasSlug
     public function updateOrNewSlug(array $slugParams): void
     {
         if (in_array($slugParams['locale'], config('twill.slug_utf8_languages', []))) {
-            $slugParams['slug'] = $this->getUtf8Slug($slugParams['slug'], ['from_encoding' => mb_list_encodings()]);
+            $slugParams['slug'] = $this->getUtf8Slug($slugParams['slug']);
         } else {
             $slugParams['slug'] = Str::slug($slugParams['slug']);
         }
@@ -171,7 +172,7 @@ trait HasSlug
         // Active old slug if already existing or create a new one.
         if ($oldMatchingSlug) {
             $isNowActive = (bool)($slugParams['active'] ?? false);
-            if ($oldMatchingSlug->active != $isNowActive) {
+            if ( $oldMatchingSlug->active != $isNowActive) {
                 $this->slugs()->whereKey($oldMatchingSlug->getKey())->update(['active' => $isNowActive]);
                 if ($this->relationLoaded('slugs')) {
                     // Report update to slugs so that getSlug() returns the correct value
@@ -205,9 +206,9 @@ trait HasSlug
                 $query->where(function ($query) use ($value, $forRecreate) {
                     $query->orWhere('slug', $value);
 
-                    if (!$forRecreate) {
+                    if (! $forRecreate) {
                         $query->orWhere('slug', $value . '-' . $this->getSuffixSlug());
-                        for ($i = 2; $i <= $this->nb_variation_slug; ++$i) {
+                        for ($i = 2; $i <= $this->nb_variation_slug; $i++) {
                             $query->orWhere('slug', $value . '-' . $i);
                         }
                     }
@@ -238,7 +239,7 @@ trait HasSlug
         }
     }
 
-    public function disableLocaleSlugs(string|array $locale = null, int|array $except_slug_id = 0): void
+    public function disableLocaleSlugs(string|array|null $locale = null, int|array $except_slug_id = 0): void
     {
         $query = $this->slugs()
             ->where('active', true)
@@ -266,7 +267,7 @@ trait HasSlug
         unset($slugParams['active']);
 
 
-        for ($i = 2; $i <= $this->nb_variation_slug + 1; ++$i) {
+        for ($i = 2; $i <= $this->nb_variation_slug + 1; $i++) {
             /** @var Builder $qCheck */
             $qCheck = $this->getSlugModelClass()::query();
             $qCheck->whereNull($this->getDeletedAtColumn());
@@ -280,8 +281,8 @@ trait HasSlug
                 break;
             }
 
-            if (!empty($slugParams['slug'])) {
-                $slugParams['slug'] = $slugBackup . (($i > $this->nb_variation_slug) ? "-" . $this->getSuffixSlug() : "-{$i}");
+            if (! empty($slugParams['slug'])) {
+                $slugParams['slug'] = $slugBackup . (($i > $this->nb_variation_slug) ? '-' . $this->getSuffixSlug() : "-{$i}");
             }
         }
 
@@ -350,7 +351,7 @@ trait HasSlug
             return $slug->slug;
         }
 
-        return "";
+        return '';
     }
 
     public function getSlugAttribute(): string
@@ -364,7 +365,7 @@ trait HasSlug
     }
     public function getSlugFields(): array
     {
-        if (!isset($this->slugFields) && isset($this->slugAttributes)) {
+        if (! isset($this->slugFields) && isset($this->slugAttributes)) {
             trigger_deprecation('area17/twill', '3.5', 'The slugAttributes property has been deprecated instead define slug fields with the slugFields property and additional columns with the slugDeps property');
         }
         return $this->slugFields ?? array_slice($this->slugAttributes ?? [], 0, 1);
@@ -444,20 +445,20 @@ trait HasSlug
         foreach (getLocales() as $appLocale) {
             if ($appLocale === $locale || $locale === null) {
                 $attributes = $this->slugAttributes;
-                if (!$attributes) {
+                if (! $attributes) {
                     continue;
                 }
                 $slugAttribute = array_shift($attributes);
                 $slugDependenciesAttributes = [];
                 foreach ($attributes as $attribute) {
-                    if (!isset($this->$attribute)) {
+                    if (! isset($this->$attribute)) {
                         throw new \Exception("You must define the field {$attribute} in your model");
                     }
 
                     $slugDependenciesAttributes[$attribute] = $this->$attribute;
                 }
 
-                if (!isset($this->$slugAttribute)) {
+                if (! isset($this->$slugAttribute)) {
                     throw new \Exception("You must define the field {$slugAttribute} in your model");
                 }
 
@@ -491,7 +492,7 @@ trait HasSlug
      */
     public function getForeignKey(): string
     {
-        return Str::snake(class_basename(get_class($this))) . "_id";
+        return Str::snake(class_basename(get_class($this))) . '_id';
     }
 
     protected function getSuffixSlug(): string|int
@@ -516,8 +517,10 @@ trait HasSlug
         // Merge options
         $options = array_merge($defaults, $options);
 
-        // Make sure string is in UTF-8 and strip invalid UTF-8 characters
-        $str = mb_convert_encoding((string)$str, 'UTF-8', $options['from_encoding']);
+        if (!empty($options['from_encoding'])) {
+            // Make sure string is in UTF-8 and strip invalid UTF-8 characters
+            $str = mb_convert_encoding((string)$str, 'UTF-8', $options['from_encoding']);
+        }
 
         $char_map = [
             // Latin

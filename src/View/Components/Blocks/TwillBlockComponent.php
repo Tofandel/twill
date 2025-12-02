@@ -14,7 +14,9 @@ use Illuminate\View\Component;
 abstract class TwillBlockComponent extends Component
 {
     public ?Block $block = null;
+
     public ?RenderData $renderData = null;
+
     public bool $inEditor = false;
 
     final public function __construct()
@@ -65,6 +67,7 @@ abstract class TwillBlockComponent extends Component
 
     public static function getBlockName(): string
     {
+
         return Str::afterLast(static::class, '\\');
     }
 
@@ -132,7 +135,7 @@ abstract class TwillBlockComponent extends Component
     final public function renderForm(): View
     {
         return view('twill::partials.form.renderer.block_form', [
-            'fields' => $this->getForm()->renderForBlocks()
+            'fields' => $this->getForm()->renderForBlocks(),
         ]);
     }
 }

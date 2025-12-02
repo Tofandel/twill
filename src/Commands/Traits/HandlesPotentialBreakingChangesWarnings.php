@@ -46,11 +46,11 @@ trait HandlesPotentialBreakingChangesWarnings
         } else {
             if (!$mediablesHasPosition) {
                 $this->info("You can find the migration source there:");
-                $this->info("🔗 https://raw.githubusercontent.com/area17/twill/refs/tags/3.5.0/migrations/default/2020_02_09_000015_add_position_to_twill_default_mediables_table.php");
+                $this->info('🔗 https://raw.githubusercontent.com/area17/twill/refs/tags/3.5.0/migrations/default/2020_02_09_000015_add_position_to_twill_default_mediables_table.php');
             }
             if (!$fileablesHasPosition) {
                 $this->info("You can find the migration source there:");
-                $this->info("🔗 https://raw.githubusercontent.com/area17/twill/refs/tags/3.5.0/migrations/default/2020_02_09_000016_add_position_to_twill_default_fileables_table.php");
+                $this->info('🔗 https://raw.githubusercontent.com/area17/twill/refs/tags/3.5.0/migrations/default/2020_02_09_000016_add_position_to_twill_default_fileables_table.php');
             }
         }
     }

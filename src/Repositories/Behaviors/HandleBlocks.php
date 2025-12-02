@@ -69,7 +69,7 @@ trait HandleBlocks
 
             $fakeBlockId++;
             $newChildBlock->id = $fakeBlockId;
-            if (!empty($childBlock['blocks'])) {
+            if (! empty($childBlock['blocks'])) {
                 $childBlockHydrated = $this->hydrateHandleBlocks(
                     $newChildBlock,
                     $childBlock,
@@ -138,7 +138,7 @@ trait HandleBlocks
     ): void {
         // Find an existing block id based on the frontend id.
         if (
-            !in_array($blockData['id'] ?? null, $existingBlockIds, false) &&
+            ! in_array($blockData['id'] ?? null, $existingBlockIds, false) &&
             $id = TwillUtil::hasBlockIdFor($blockData['id'])
         ) {
             $originalBlockId = $blockData['id'];
@@ -237,9 +237,9 @@ trait HandleBlocks
     }
 
     /**
-     * @param \A17\Twill\Models\Model $object
+     * @param Model $object
      * @param array $fields
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function getBlocks($object, $fields)
     {
@@ -265,9 +265,9 @@ trait HandleBlocks
     /**
      * Recursively generate child blocks from the fields of a block.
      *
-     * @param \A17\Twill\Models\Model $object
+     * @param Model $object
      * @param array $parentBlockFields
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function getChildBlocks($object, $parentBlockFields)
     {
@@ -298,7 +298,7 @@ trait HandleBlocks
         bool $handleTranslations
     ): void {
         $this->validate(
-            (array)$block['content'] + ($block['medias'] ?? []) + ($block['browsers'] ?? []) + ($block['blocks'] ?? []),
+            (array) $block['content'] + ($block['medias'] ?? []) + ($block['browsers'] ?? []) + ($block['blocks'] ?? []),
             $block['id'],
             $blockInstance->getRules(),
             $handleTranslations ? $blockInstance->getRulesForTranslatedFields() : []
@@ -307,7 +307,7 @@ trait HandleBlocks
 
     /**
      * @param array $block
-     * @param \A17\Twill\Models\Model $object
+     * @param Model $object
      * @param bool $repeater
      * @return array
      */
@@ -320,7 +320,7 @@ trait HandleBlocks
     }
 
     /**
-     * @param \A17\Twill\Models\Model $object
+     * @param Model $object
      * @param array $fields
      * @return array
      */
@@ -434,7 +434,7 @@ trait HandleBlocks
     }
 
     /**
-     * @param \A17\Twill\Models\Block $block
+     * @param Block $block
      * @return array
      */
     protected function getBlockBrowsers($block)
@@ -506,6 +506,7 @@ trait HandleBlocks
         if (is_null(static::$hasRelatedTableCache)) {
             static::$hasRelatedTableCache = Schema::hasTable(config('twill.related_table', 'twill_related'));
         }
+
         return static::$hasRelatedTableCache;
     }
 }

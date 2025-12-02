@@ -22,7 +22,7 @@ if (! function_exists('getLikeOperator')) {
     function getLikeOperator(): string
     {
         return once(function () {
-            if (DB::connection()->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'pgsql') {
+            if (DB::connection()->getPDO()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
                 return 'ILIKE';
             }
 
@@ -99,9 +99,7 @@ if (! function_exists('fireCmsEvent')) {
      */
     function fireCmsEvent($eventName, $input = [])
     {
-        $method = method_exists(\Illuminate\Events\Dispatcher::class, 'dispatch') ? 'dispatch' : 'fire';
-        /** @phpstan-ignore staticMethod.notFound */
-        Event::$method($eventName, [$eventName, $input]);
+        Event::dispatch($eventName, [$eventName, $input]);
     }
 }
 
@@ -151,7 +149,7 @@ if (! function_exists('make_twill_directory')) {
     /**
      * @param string $path
      * @param bool $recursive
-     * @param \Illuminate\Filesystem\Filesystem|null $fs
+     * @param Filesystem|null $fs
      */
     function make_twill_directory($path, $recursive = true, $fs = null)
     {
@@ -171,7 +169,7 @@ if (! function_exists('twill_put_stub')) {
     /**
      * @param string $path
      * @param bool $recursive
-     * @param \Illuminate\Filesystem\Filesystem|null $fs
+     * @param Filesystem|null $fs
      */
     function twill_put_stub($path, $stub, $fs = null)
     {

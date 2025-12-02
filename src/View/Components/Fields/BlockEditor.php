@@ -43,10 +43,10 @@ class BlockEditor extends TwillFormComponent
         }
 
         return TwillBlocks::generateListOfAvailableBlocks(
-            $this->blocks ?? null,
+            $this->blocks,
             $groups,
             $this->isSettings,
-            $this->excludeBlocks ?? null,
+            $this->excludeBlocks,
             $this->usingDefaultOrder
         )->pluck('name')->all();
     }

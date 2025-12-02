@@ -85,12 +85,12 @@ trait HandleSlugs
 
         $item = (clone $query)->forSlug($slug)->with($with)->withCount($withCount)->first();
 
-        if (!$item && $item = (clone $query)->forInactiveSlug($slug)->first()) {
+        if (! $item && $item = (clone $query)->forInactiveSlug($slug)->first()) {
             $item->redirect = true;
         }
 
         if (
-            !$item && config('translatable.use_property_fallback', false)
+            ! $item && config('translatable.use_property_fallback', false)
             && config('translatable.fallback_locale') != config('app.locale')
         ) {
             $item = (clone $query)->orWhere(function ($query) {
