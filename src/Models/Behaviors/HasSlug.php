@@ -172,7 +172,7 @@ trait HasSlug
         // Active old slug if already existing or create a new one.
         if ($oldMatchingSlug) {
             $isNowActive = (bool)($slugParams['active'] ?? false);
-            if ( $oldMatchingSlug->active != $isNowActive) {
+            if ($oldMatchingSlug->active != $isNowActive) {
                 $this->slugs()->whereKey($oldMatchingSlug->getKey())->update(['active' => $isNowActive]);
                 if ($this->relationLoaded('slugs')) {
                     // Report update to slugs so that getSlug() returns the correct value

@@ -245,44 +245,24 @@ abstract class ModuleRepository
     public function updateBasic(int|string|null|array $id, array $values, array $scopes = []): bool
     {
         return DB::transaction(function () use ($id, $values, $scopes) {
-            // apply scopes if no id provided
+            $query = $this->model::query();
             if ($id === null) {
-                $query = $this->model::query();
-
+                // Should we throw if scope is empty as that would update the whole table?
                 foreach ($scopes as $column => $value) {
                     $query->where($column, $value);
                 }
-
-                $query->update($values);
-
-                $query->get()->each(function ($model) use ($values) {
-                    /* @var TwillModelContract $model */
-                    $this->afterUpdateBasic($model, $values);
-                });
-
-                return true;
+            } else {
+                $query->whereIn('id', Arr::wrap($id));
             }
+            $updated = $query->update($values) > 0;
 
-            // apply to all ids if array of ids provided
-            if (is_array($id)) {
-                $query = $this->model->whereIn('id', $id);
-                $query->update($values);
-
+            if (!empty($this->traitsMethods('afterUpdateBasic'))) {
                 $query->get()->each(function ($object) use ($values) {
                     $this->afterUpdateBasic($object, $values);
                 });
-
-                return true;
             }
 
-            if ($model = $this->model->find($id)) {
-                $model->update($values);
-                $this->afterUpdateBasic($model, $values);
-
-                return true;
-            }
-
-            return false;
+            return $updated;
         }, 3);
     }
 
@@ -456,7 +436,7 @@ abstract class ModuleRepository
     }
 
     /**
-     * @return array|<missing>
+     * @return array
      */
     public function prepareFieldsBeforeCreate(array $fields): array
     {
@@ -470,7 +450,7 @@ abstract class ModuleRepository
     }
 
     /**
-     * @return array|<missing>
+     * @return array
      */
     public function prepareFieldsBeforeSave(TwillModelContract $object, array $fields): array
     {
@@ -767,19 +747,21 @@ abstract class ModuleRepository
 
     protected function traitsMethods(?string $method = null): array
     {
+        static $trait_cache = [];
+
+        if (!isset($trait_cache[static::class])) {
+            $trait_cache[static::class] = array_values(class_uses_recursive(static::class));
+        }
+        $traits = $trait_cache[static::class];
         $method = $method ?? debug_backtrace()[1]['function'];
 
-        $traits = array_values(class_uses_recursive(static::class));
-
-        $uniqueTraits = array_unique(array_map('class_basename', $traits));
-
         $methods = array_map(function (string $trait) use ($method) {
-            return $method . $trait;
-        }, $uniqueTraits);
+            return $method . class_basename($trait);
+        }, $traits);
 
-        return array_filter($methods, function (string $method) {
+        return array_unique(array_filter($methods, function (string $method) {
             return method_exists(static::class, $method);
-        });
+        }));
     }
 
     /**

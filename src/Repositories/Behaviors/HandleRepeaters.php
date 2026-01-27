@@ -112,20 +112,9 @@ trait HandleRepeaters
         $morphFieldType = $morph . '_type';
         $morphFieldId = $morph . '_id';
 
-        // if no relation field submitted, soft deletes all associated rows
-        if (! $relationFields) {
-            $relationRepository->updateBasic(null, [
-                'deleted_at' => Carbon::now(),
-            ], [
-                $morphFieldType => $object->getMorphClass(),
-                $morphFieldId => $object->id,
-            ]);
-        }
-
         // keep a list of updated and new rows to delete (soft delete?) old rows that were deleted from the frontend
         $currentIdList = [];
 
-        // @todo: This needs refactoring in 3.x
         foreach ($relationFields as $index => $relationField) {
             $relationField['position'] = $index + 1;
             $relationField[$morphFieldId] = $object->id;
@@ -147,11 +136,7 @@ trait HandleRepeaters
 
         foreach ($object->$relation()->pluck('id') as $id) {
             if (! in_array($id, $currentIdList, true)) {
-                $relationRepository->updateBasic(null, [
-                    'deleted_at' => Carbon::now(),
-                ], [
-                    'id' => $id,
-                ]);
+                $relationRepository->delete($id);
             }
         }
     }
@@ -176,6 +161,7 @@ trait HandleRepeaters
         // We only do this when the model is already existing.
         if (! $relationFields && ! $object->wasRecentlyCreated) {
             $object->{$relation}()->detach();
+            return;
         }
 
         // Add the position to the pivot fields.
@@ -292,16 +278,6 @@ trait HandleRepeaters
         }
         $fk ??= $this->model->getForeignKey();
 
-        // If no relation field submitted, soft deletes all associated rows.
-        // We only do this when the model is already existing.
-        if (! $relationFields && ! $object->wasRecentlyCreated) {
-            $relationRepository->updateBasic(null, [
-                'deleted_at' => Carbon::now(),
-            ], [
-                $fk => $object->id,
-            ]);
-        }
-
         // keep a list of updated and new rows to delete (soft delete?) old rows that were deleted from the frontend
         $currentIdList = [];
 
@@ -348,11 +324,7 @@ trait HandleRepeaters
         foreach ($object->{$relation}()->pluck('id') as $id) {
             if (! in_array($id, $currentIdList, true)) {
                 // The pivot table is treated differently.
-                $relationRepository->updateBasic(null, [
-                    'deleted_at' => Carbon::now(),
-                ], [
-                    'id' => $id,
-                ]);
+                $relationRepository->delete($id);
             }
         }
     }
